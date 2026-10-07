@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Environment variables (only .env.example is versioned)
+.env
+
+# Local SQLite database
+*.sqlite
+*.db
+
+# Build output
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
