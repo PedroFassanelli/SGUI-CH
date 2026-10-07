@@ -6,13 +6,18 @@ import { NotFoundError } from '../errors/AppError.js';
 // are not pre-checked here: the database enforces them atomically and the
 // error handler translates them into a 409 response.
 
-export function findAllUsers() {
-  return User.findAll({
-    order: [
-      ['lastName', 'ASC'],
-      ['firstName', 'ASC'],
-    ],
-  });
+// SQLite sorts text by raw bytes, which puts "Álvarez" after "Pérez" and
+// lowercase after uppercase. We sort in memory with Spanish collation rules.
+// Fine for an unpaginated list; with pagination, sorting must move to the DB.
+const spanishCollator = new Intl.Collator('es', { sensitivity: 'base' });
+
+const byFullName = (a, b) =>
+  spanishCollator.compare(a.lastName, b.lastName) ||
+  spanishCollator.compare(a.firstName, b.firstName);
+
+export async function findAllUsers() {
+  const users = await User.findAll();
+  return users.sort(byFullName);
 }
 
 export async function findUserById(id) {
