@@ -32,7 +32,8 @@ const sampleUsers = [
 
 try {
   await sequelize.sync({ force: true });
-  await User.bulkCreate(sampleUsers);
+  // bulkCreate skips model validations (e.g. isEmail) unless asked explicitly.
+  await User.bulkCreate(sampleUsers, { validate: true });
   console.log(`Seed completado: ${sampleUsers.length} usuarios cargados.`);
 } catch (error) {
   console.error('Error ejecutando el seed:', error);

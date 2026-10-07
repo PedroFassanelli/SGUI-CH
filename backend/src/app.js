@@ -1,5 +1,7 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
 import { userRouter } from './routes/userRoutes.js';
+import { openApiDocument } from './docs/openapi.js';
 import { notFound } from './middlewares/notFound.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -11,6 +13,10 @@ export function createApp() {
 
   app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
   app.use('/api/users', userRouter);
+
+  // API documentation: interactive UI and the raw OpenAPI document.
+  app.get('/api/docs/openapi.json', (_req, res) => res.json(openApiDocument));
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
   // Order matters: these two must be registered after all routes.
   app.use(notFound);
