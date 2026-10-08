@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useUsers } from '../hooks/useUsers.js';
 import { UserTable } from '../components/UserTable.jsx';
 import { ConfirmDialog } from '../components/ConfirmDialog.jsx';
@@ -10,7 +10,8 @@ export function UsersListPage() {
   const { users, isLoading, error, reload, removeUser } = useUsers();
   const [userToDelete, setUserToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [feedback, setFeedback] = useState(null);
+  const flash = useFlashMessage();
+  const [feedback, setFeedback] = useState(flash);
 
   async function handleConfirmDelete() {
     const fullName = formatFullName(userToDelete);
@@ -73,6 +74,20 @@ export function UsersListPage() {
       </ConfirmDialog>
     </section>
   );
+}
+
+// Reads the one-time message sent by other pages through the navigation state
+// (e.g. "user created") and then clears it, so a page refresh doesn't show it again.
+function useFlashMessage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const flash = location.state?.flash ?? null;
+
+  useEffect(() => {
+    if (flash) navigate('.', { replace: true, state: null });
+  }, [flash, navigate]);
+
+  return flash;
 }
 
 // Picks what to show for each state of the request: loading, error, empty or data.

@@ -14,5 +14,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
+    // Reset every mock's calls and implementation between tests.
+    mockReset: true,
   },
 });
